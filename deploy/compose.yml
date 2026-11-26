@@ -1,0 +1,20 @@
+services:
+  web:
+    image: itkpdn:${RELEASE_SHA:?Release SHA required}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    networks: [proxy]
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: cankonix-proxy
+      traefik.http.routers.itkpdn.rule: Host(`dashboard-itkpdn.cankonix.com`)
+      traefik.http.routers.itkpdn.entrypoints: websecure
+      traefik.http.routers.itkpdn.tls: "true"
+      traefik.http.routers.itkpdn.tls.certresolver: letsencrypt
+      traefik.http.services.itkpdn.loadbalancer.server.port: "80"
+networks:
+  proxy:
+    external: true
+    name: cankonix-proxy
